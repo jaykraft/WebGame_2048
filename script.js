@@ -1,11 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const size = 4;
     const cells = Array.from(document.querySelectorAll('.grid-cell'));
+    const restartButton = document.getElementById('restart-button');
+    const gameOverElement = document.getElementById('game-over');
 
     function createBoard() {
+        cells.forEach(cell => {
+            cell.innerHTML = '';
+            cell.className = 'grid-cell';
+        })
         generateNewTile();
         generateNewTile();
         updateBoard();
+        gameOverElement.classList.add('hidden');
     }
 
     function generateNewTile() {
@@ -49,6 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (moved) {
             generateNewTile();
             updateBoard();
+            if (checkGameOver()){
+                gameOverElement.classList.remove('hidden');
+            }
         }
     }
 
@@ -78,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleKeydown(event) {
+        if (!gameOverElement.classList.contains('hidden')) return;
         switch (event.key) {
             case 'ArrowLeft':
                 move('left');
@@ -94,6 +105,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    createBoard();
+    function checkGameOver(){
+        if (cells.some(cell => cell.innerHTML === '')) return false;
+        for (let i = 0; i < size; i++){
+            for (let j = 0; j < size - 1; j++){
+                if (cells[i * size + j].innerHTML === cells[i * size + j + 1].innerHTML) return false;
+                if (cells[j * size + i].innerHTML === cells[(j + 1) * size + i].innerHTML) return false;
+            }
+        }
+        return true;
+    }
+
+    restartButton.addEventListener('click', createBoard);
     document.addEventListener('keydown', handleKeydown);
+    createBoard();
 });
