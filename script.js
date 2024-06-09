@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cells = Array.from(document.querySelectorAll('.grid-cell'));
     const restartButton = document.getElementById('restart-button');
     const gameOverElement = document.getElementById('game-over');
+    const scoreElement = document.getElementById('score');
+    let score = 0;
 
     function createBoard() {
         cells.forEach(cell => {
@@ -13,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         generateNewTile();
         updateBoard();
         gameOverElement.classList.add('hidden');
+        score = 0;
+        updateScore();
     }
 
     function generateNewTile() {
@@ -51,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     rowOrCol = cells.filter((_, index) => index % size === i).reverse();
                     break;
             }
-            moved = slideAndCombine(rowOrCol) || moved;
+            moved = slideAndMerge(rowOrCol) || moved;
         }
         if (moved) {
             generateNewTile();
@@ -62,28 +66,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function slideAndCombine(rowOrCol) {
+    function slideAndMerge(rowOrCol) {
         let moved = false;
-        let arr = rowOrCol.map(cell => parseInt(cell.innerHTML) || 0);
-        let filtered = arr.filter(val => val);
-        let empty = Array(size - filtered.length).fill(0);
-        arr = filtered.concat(empty);
+        let arr = rowOrCol.map(cell => cell.innerHTML ? parseInt(cell.innerHTML) : 0);
+        let newArr = arr.filter(val => val);
+        while (newArr.length < size) newArr.push(0);
+
         for (let i = 0; i < size - 1; i++) {
-            if (arr[i] === arr[i + 1] && arr[i] !== 0) {
-                arr[i] *= 2;
-                arr[i + 1] = 0;
+            if (newArr[i] && newArr[i] === newArr[i + 1]) {
+                newArr[i] *= 2;
+                score += newArr[i];
+                newArr[i + 1] = 0;
+                updateScore();
+            }
+        }
+
+        newArr = newArr.filter(val => val);
+        while (newArr.length < size) newArr.push(0);
+
+        for (let i = 0; i < size; i++) {
+            if (rowOrCol[i].innerHTML != newArr[i]) {
+                rowOrCol[i].innerHTML = newArr[i] ? newArr[i] : '';
                 moved = true;
             }
         }
-        filtered = arr.filter(val => val);
-        empty = Array(size - filtered.length).fill(0);
-        arr = filtered.concat(empty);
-        arr.forEach((val, index) => {
-            if (rowOrCol[index].innerHTML != (val || '')) {
-                rowOrCol[index].innerHTML = val || '';
-                moved = true;
-            }
-        });
         return moved;
     }
 
@@ -114,6 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return true;
+    }
+
+    function updateScore() {
+        scoreElement.innerText = score;
     }
 
     restartButton.addEventListener('click', createBoard);

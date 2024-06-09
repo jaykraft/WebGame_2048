@@ -11,8 +11,7 @@ body {
 .container {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
+    width: 670px;
 }
 
 .sidebar, .game-container {
@@ -26,6 +25,22 @@ body {
     justify-content: flex-start;
     align-items: center;
     margin-right: 20px;
+}
+
+#score-container {
+    background: #bbada0;
+    color: #f9f6f2;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+
+.game-ui {
+    display: flex;
+    flex-direction: row;
 }
 
 .instructions {
